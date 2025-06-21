@@ -224,14 +224,10 @@ with col2:
 # 3) Prevalence over time
 with col3:
     st.markdown(f"**{country}: Tobacco Prevalence Over Time**")
-    prev_ts = (
-        tob.groupby(["year","sex"], as_index=False)
-           .prevalence.mean()
-           .sort_values("year")
-    )
+
     # 1) prepare historical data
     prev_ts = (
-        tob.groupby(["year","sex"], as_index=False)
+        tob.dropna(subset=["prevalence"]).groupby(["year","sex"], as_index=False)
         .prevalence.mean()
         .sort_values("year")
     )
@@ -396,7 +392,7 @@ fig = px.bar(
         'year_sex': 'Year - Sex',
         'indicator_name': 'Indicator'
     },
-    height=500
+    height=300
 )
 
 # Update layout for better appearance
@@ -410,7 +406,6 @@ fig.update_layout(
         title="Tobacco Use Indicators"
     ),
     xaxis=dict(
-        tickangle=45,
         categoryorder='category ascending'
     )
 )
@@ -423,3 +418,5 @@ fig.update_layout(
 )
 
 st.plotly_chart(fig, use_container_width=True)
+
+st.caption("Data source: WHO Global Health Observatory")
