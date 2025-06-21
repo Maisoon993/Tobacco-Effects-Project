@@ -1,0 +1,11 @@
+[server]
+headless = true
+enableCORS = false
+port = ${PORT}
+
+[theme]
+base="light"
+
+[global]
+# tell Streamlit Cloud which script to run
+main = "app.py"
