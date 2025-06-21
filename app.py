@@ -47,8 +47,8 @@ def load_mortality(path):
     )
 
 # ─── 3) Read data ───────────────────────────────────────────────────────
-tob_path = Path(r".\data\rep_gho_tobacco\data.xlsx")                
-mor_path = Path(r".\data\rep_ihme_inc\data.xlsx")
+tob_path = Path(r"./data/rep_gho_tobacco/data.xlsx")                
+mor_path = Path(r"./data/rep_ihme_inc/data.xlsx")
 
 df_tob = load_tobacco(tob_path, ["Estimate of current tobacco use prevalence (age-standardized) (%)"])
 df_mor = load_mortality(mor_path)
