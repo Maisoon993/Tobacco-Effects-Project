@@ -5,14 +5,14 @@ from pathlib import Path
 import numpy as np
 import plotly.graph_objects as go
 
-# ─── 1) Page config ─────────────────────────────────────────────────────
+# Page config
 st.set_page_config(
     page_title="Tobacco & Mortality – WHO Dashboard",
     layout="wide",
 )
 st.title("Effects of Tobacco on Tracheal, Bronchus, and Lung Cancer Mortality")
 
-# ─── 2) Loaders ─────────────────────────────────────────────────────────
+# Loaders
 @st.cache_data
 def load_tobacco(path, indicators):
     df = pd.read_excel(path, sheet_name="Sheet1")
@@ -33,6 +33,7 @@ def load_tobacco(path, indicators):
 
 @st.cache_data
 def load_mortality(path):
+    # Get only TBL Cancer mortality rate
     indicators = ["2.A.05 Tracheal, bronchus, and lung cancer incidence (age standardized) (per 100 000 population)"]
     df = pd.read_excel(path, sheet_name="Sheet1")
     df = df[df["indicator_name"].isin(indicators) & df["subgroup"].isin(["Male", "Female"])]
@@ -46,14 +47,15 @@ def load_mortality(path):
         .assign(year=lambda d: d.year.astype(int))
     )
 
-# ─── 3) Read data ───────────────────────────────────────────────────────
+# Read data
 tob_path = Path(r"./data/rep_gho_tobacco/data.xlsx")                
 mor_path = Path(r"./data/rep_ihme_inc/data.xlsx")
 
+# Get estimate of current tobacco use prevalence (age-standardized)
 df_tob = load_tobacco(tob_path, ["Estimate of current tobacco use prevalence (age-standardized) (%)"])
 df_mor = load_mortality(mor_path)
 
-# ─── 4) In‐page Country selector & KPI panel ────────────────────────────
+# In‐page Country selector & KPI panel
 left, mid, right = st.columns([1,2,1], gap="large")
 
 with left:
@@ -76,8 +78,8 @@ with left:
 
     # show them in a 2×2 grid
     for label, val in [
-        (f"{country} Male Prevalence (%)",   f"{male_prev:.2f}"),
-        (f"{country} Female Prevalence (%)", f"{female_prev:.2f}"),
+        (f"{country} Male Tobacco Prevalence (%)",   f"{male_prev:.2f}"),
+        (f"{country} Female Tobacco Prevalence (%)", f"{female_prev:.2f}"),
         (f"{country} Male Mortality (per 100 000)",   f"{male_mort:,.0f}"),
         (f"{country} Female Mortality (per 100 000)", f"{female_mort:,.0f}")
     ]:
@@ -132,7 +134,7 @@ with right:
     st.plotly_chart(fig1, use_container_width=True)
 
     st.markdown(
-    "<span style='font-size:16px; font-weight:600;'>Mortality by Income Group</span>",
+    "<span style='font-size:16px; font-weight:600;'>TBL Cancer Mortality by Income Group</span>",
     unsafe_allow_html=True
     )
     grp_mor = (
@@ -152,10 +154,10 @@ with right:
     )
     st.plotly_chart(fig2, use_container_width=True)
 
-# ─── 5) Top-10 Countries row ─────────────────────────────────────────────
+# Top-5 Countries row
 col1, col2, col3, col4 = st.columns(4, gap="small")
 
-# 1) Top-10 Prevalence
+# 1) Top-5 Prevalence
 with col1:
     st.markdown("**Top 5 Countries with Highest Tobacco Use**")
     top_prev = (
@@ -188,9 +190,9 @@ with col1:
 
     st.plotly_chart(fig_tp, use_container_width=True)
 
-# 2) Top-10 Mortality
+# 2) Top Mortality
 with col2:
-    st.markdown("**Top 5 Countries with Highest Mortality**")
+    st.markdown("**Top 5 Countries with Highest TBL Mortality**")
     top_mor = (
         df_mor.groupby("country", as_index=False)
               .mortality.mean()
@@ -287,7 +289,7 @@ with col3:
 
 # 4) Mortality over time
 with col4:
-    st.markdown(f"**{country}: Cancer Mortality Over Time**")
+    st.markdown(f"**{country}: TBL Mortality Over Time**")
     # 1) historical
     mort_ts = (
         mor.groupby(["year","sex"], as_index=False)
